@@ -75,9 +75,12 @@ GROQ_API_KEY=your_groq_api_key_here
 
 The public Hugging Face embedding model downloads without a token, so `HF_TOKEN` is not required. Keep real keys in `.env`; do not commit them.
 
-**3. Ingest data into Chroma**
+**3. Index the knowledge base**
 
-Run the three ingestion scripts once to build the vector store:
+The app automatically builds any missing Chroma collections from the committed
+FAQ, ticket database, and PDF guide when it starts. This also initializes the
+index when deploying to Streamlit Community Cloud, where `chroma_store/` is not
+included in Git. To manually ingest or refresh the collections, run:
 
 ```bash
 python ingest_faq.py

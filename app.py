@@ -1,6 +1,7 @@
 import os
 os.environ["TRANSFORMERS_VERBOSITY"] = "error"
 
+from groq import RateLimitError
 import streamlit as st
 from dotenv import load_dotenv
 from rag_chain import build_chain
@@ -76,6 +77,16 @@ if question:
                 "https://console.groq.com/keys."
             )
         else:
-            chain = get_chain()
-            response = st.write_stream(chain.stream(question))
-            st.session_state.messages.append({"role": "assistant", "content": response})
+            try:
+                chain = get_chain()
+                response = st.write_stream(chain.stream(question))
+            except RateLimitError:
+                st.error(
+                    "The Groq API rate limit has been reached. Please wait a moment "
+                    "and try again. If this keeps happening, check your Groq usage "
+                    "limits or billing settings."
+                )
+            else:
+                st.session_state.messages.append(
+                    {"role": "assistant", "content": response}
+                )

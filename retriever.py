@@ -9,6 +9,10 @@ from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_core.runnables import RunnableLambda
 from langchain_core.documents import Document
 
+from ingest_faq import CSV_PATH as FAQ_PATH, load_faq_documents
+from ingest_pdf import load_guide_documents
+from ingest_tickets import DB_PATH as TICKETS_PATH, load_ticket_documents
+
 CHROMA_DIR  = "chroma_store"
 EMBED_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 
@@ -35,6 +39,13 @@ def build_retriever(
         embedding_function=embeddings,
         persist_directory=CHROMA_DIR,
     )
+
+    if faq_store._collection.count() == 0:
+        faq_store.add_documents(load_faq_documents(FAQ_PATH))
+    if tickets_store._collection.count() == 0:
+        tickets_store.add_documents(load_ticket_documents(TICKETS_PATH))
+    if guides_store._collection.count() == 0:
+        guides_store.add_documents(load_guide_documents())
 
     faq_retriever     = faq_store.as_retriever(search_kwargs={"k": k_faq})
     tickets_retriever = tickets_store.as_retriever(search_kwargs={"k": k_tickets})

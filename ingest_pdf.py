@@ -10,6 +10,7 @@ from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_chroma import Chroma
 from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_core.documents import Document
 
 CHROMA_DIR = "chroma_store"
 COLLECTION = "guides"
@@ -20,9 +21,9 @@ CHUNK_SIZE    = 600
 CHUNK_OVERLAP = 100
 
 
-def main():
+def load_guide_documents(pdf_path: str = PDF_PATH) -> list[Document]:
     print("Loading PDF...")
-    loader = PyPDFLoader(PDF_PATH)
+    loader = PyPDFLoader(pdf_path)
     pages = loader.load()
     print(f"  {len(pages)} pages loaded.")
 
@@ -40,6 +41,11 @@ def main():
         chunk.metadata["chunk_index"] = i
 
     print(f"  {len(chunks)} chunks produced.")
+    return chunks
+
+
+def main():
+    chunks = load_guide_documents()
 
     print("Initialising embedding model...")
     embeddings = HuggingFaceEmbeddings(model_name=EMBED_MODEL)

@@ -8,6 +8,7 @@ dependencies = [
     "langchain-core",
     "langchain-chroma",
     "langchain-groq",
+    "groq",
     "langchain-huggingface",
     "chromadb",
     "sentence-transformers",
